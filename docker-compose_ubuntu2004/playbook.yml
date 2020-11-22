@@ -1,0 +1,62 @@
+- hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  gather_facts: false
+  tasks:
+  - name: Instalación del entorno para Docker .
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    tags:
+      - docker
+  - name: Agregando clave de cifrado GPG oficial de Docker .
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+    tags:
+      - docker
+  - name: Verificación de la clave de cifrado GPG de Docker por medio de huella .
+    apt_key:
+      id: 0EBFCD88
+      state: present
+    tags:
+      - docker
+  - name: Agregando repositorio Docker rama estable Ubuntu 20.04 focal .
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+      state: present
+      update_cache: yes
+    tags:
+      - docker
+  - name: Actualizando catálogo del repositorio apt .
+    apt:
+      update_cache: yes
+    tags:
+      - docker
+  - name: Instalando Docker (edición comunitaria) .
+    apt:
+      name: docker-ce
+      state: present
+      update_cache: yes
+    #notify: Start docker on boot
+    tags:
+      - docker
+  - name: Agregando usuario al grupo "docker" .
+    user:
+      name: "{{ ans_usuario }}"
+      group: "docker"
+      append: yes
+    tags:
+      - docker
+  - name: Instalando docker-compose .
+    get_url: 
+      url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: 'u+x,g+x'
