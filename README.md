@@ -33,7 +33,6 @@ lemp_ubuntu1804
 └── readme.md
 ```
 
-
 - `files/`: directory containing templates and other files required by the playbook.
 - `vars/`: directory to save variable files. A `default.yml` var file is included by default.
 - `playbook.yml`: the playbook file.
