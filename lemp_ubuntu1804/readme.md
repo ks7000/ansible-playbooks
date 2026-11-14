@@ -18,7 +18,7 @@ Quick Steps:
 
 ### 1. Obtain the playbook
 ```shell
-git clone https://github.com/do-community/ansible-playbooks.git
+git clone https://github.com/ks7000/ansible-playbooks.git
 cd ansible-playbooks/lemp_ubuntu1804
 ```
 

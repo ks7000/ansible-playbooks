@@ -1,4 +1,4 @@
-# DO Community - Ansible Playbooks
+# DO Community / KS7000 Community - Ansible Playbooks
 
 A collection of minimalist Ansible playbooks for automating server setups, based on DigitalOcean's Community guides.
 
