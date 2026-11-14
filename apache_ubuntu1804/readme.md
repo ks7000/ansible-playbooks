@@ -10,7 +10,6 @@ This playbook will install the Apache 2 web server on an Ubuntu 18.04 machine, a
 - `http_port`: HTTP port, default is 80.
 - `disable_default`: whether or not to disable the default Apache website. When set to true, your new virtualhost should be used as default website. Default is true.
 
-
 ## Running this Playbook
 
 Quick Steps:
