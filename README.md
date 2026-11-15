@@ -39,7 +39,7 @@ lemp_ubuntu1804
 - `vars/`: directory to save variable files. A `default.yml` var file is included by default.
 - `playbook.yml`: the playbook file.
 - `readme.md`: instructions and links related to this playbook.
-- `readme.md`: instructions (Castilian language) and links related to this playbook.
+- `leeme.md`: instructions (Castilian language) and links related to this playbook.
 
 ## Getting Started
 
