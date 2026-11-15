@@ -1,6 +1,5 @@
 # Docker en Ubuntu 18.04
 
-[Leer en Castellano (LEEME.md)](./LEEME.md)
 
 Este manual le guiará en la instalación de Docker en un equipo con Ubuntu 18.04, tal y como se explica en la guía en inglés sobre
 [How to Use Ansible to Install and Set Up Docker on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-install-and-set-up-docker-on-ubuntu-18-04).

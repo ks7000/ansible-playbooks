@@ -2,7 +2,6 @@
 
 ## Configuración inicial de servidor Ubuntu 18.04
 
-[Leer en Castellano (LEEME.md)](./LEEME.md)
 
 Este guion llevará a cabo una configuración inicial del servidor para sistemas Ubuntu 18.04, tal y como se explica en la guía en inglés sobre
 [Initial Server Setup Guide for Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-automate-initial-server-setup-on-ubuntu-18-04).
