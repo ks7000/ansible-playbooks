@@ -1,4 +1,4 @@
-# DO Community / KS7000 Community - Ansible Playbooks
+# Comunidad DO / Comunidad KS7000 - Libretos de Ansible
 
 Una recopilación de guiones en libretos (libro de memoria o, en idioma inglés, _playbooks_) minimalistas de Ansible para automatizar la configuración de servidores, basada en las guías de la comunidad de DigitalOcean y continuada por la [comunidad de KS7000](https//www.ks7000.net.ve/).
 
