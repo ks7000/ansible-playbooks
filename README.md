@@ -1,5 +1,7 @@
 # DO Community / KS7000 Community - Ansible Playbooks
 
+[![Pruebas de libretos Ansible (sintaxis)](https://github.com/ks7000/ansible-playbooks/actions/workflows/test-playbooks.yml/badge.svg)](https://github.com/ks7000/ansible-playbooks/actions/workflows/test-playbooks.yml)
+
 [Leer en Castellano (LEEME.md)](./LEEME.md)
 
 A collection of minimalist Ansible playbooks for automating server setups, based on DigitalOcean's Community guides and continued by the [KS7000 Community](https//www.ks7000.net.ve/).
