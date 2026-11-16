@@ -2,12 +2,10 @@ name: Pruebas de libretos Ansible (sintaxis)
 
 on:
   push:
-#    branches: ["main"]
     paths:
       - 'apache_ubuntu2204/**'
       - '.github/workflows/playbook.yml'
   pull_request:
-#    branches: ["main"]
     paths:
       - 'apache_ubuntu2204/**'
       - '.github/workflows/playbook.yml'
@@ -34,7 +32,7 @@ jobs:
 
       - name: Ejecuta Ansible-Lint
         run: |
-          ansible-lint
+          ansible-lint apache_ubuntu2204/
 
       - name: Verificación de sintaxis de libreto
         run: |
