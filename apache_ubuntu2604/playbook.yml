@@ -1,0 +1,62 @@
+##################################################
+# DO Community Playbooks: Apache on Ubuntu 18.04
+##################################################
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars/default.yml
+
+  tasks:
+    - name: Prerrequisitos de instalación
+      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+      loop: [ 'aptitude' ]
+
+    - name: Instalación de Apache2
+      apt: name=apache2 update_cache=yes state=latest
+
+    - name: Crear documento raíz
+      file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        owner: "{{ app_user }}"
+        mode: '0755'
+
+    - name: Copiar página HTML de prueba
+      template:
+        src: "files/index.html.j2"
+        dest: "/var/www/{{ http_host }}/index.html"
+
+    - name: Configurar anfitrión virtual en Apache2
+      template:
+        src: "files/apache.conf.j2"
+        dest: "/etc/apache2/sites-available/{{ http_conf }}"
+
+    - name: Habilitar nuevo sitio web
+      shell: /usr/sbin/a2ensite {{ http_conf }}
+      notify: Recargar Apache2
+
+    - name: Deshabilitar sitio web por defecto de Apache2
+      shell: /usr/sbin/a2dissite 000-default.conf
+      when: disable_default
+      notify: Recargar Apache2
+
+    - name: Instalación de cortafuegos UFW
+      apt: name=ufw update_cache=yes state=latest
+
+    - name: "Cortafuegos UFW: Permitir HTTP en el número de puerto {{ http_port }}"
+      ufw:
+        rule: allow
+        port: "{{ http_port }}"
+        proto: tcp
+
+  handlers:
+    - name: Recargar Apache2
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Reiniciar Apache2
+      service:
+        name: apache2
+        state: restarted
