@@ -2,9 +2,18 @@ name: Pruebas de libretos Ansible (sintaxis)
 
 on:
   push:
-    branches: [ "main" ]
+#    branches: ["main"]
+    paths:
+      - 'apache_ubuntu2204/**'
+      - '.github/workflows/playbook.yml'
   pull_request:
-    branches: [ "main" ]
+#    branches: ["main"]
+    paths:
+      - 'apache_ubuntu2204/**'
+      - '.github/workflows/playbook.yml'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   lint-and-syntax:

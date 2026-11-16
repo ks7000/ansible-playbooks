@@ -2,7 +2,7 @@
 # Comunidad DO / Comunidad KS7000: Apache2 en Ubuntu 22.04 #
 ############################################################
 ---
-- hosts: all
+- hosts: servidor_202
   become: true
   vars_files:
     - vars/default.yml
@@ -16,11 +16,14 @@
         fail_msg: "Este libreto está diseñado solamente para Ubuntu 22.04 ."
 
     - name: Prerrequisitos de instalación
-      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
-      loop: [ 'aptitude' ]
+      ansible.builtin.apt:
+        name: aptitude
+        update_cache: true
+        state: present
+        force_apt_get: true
 
     - name: Instalación de Apache2
-      apt: name=apache2 update_cache=yes state=latest
+      apt: name=apache2 update_cache=yes state=present
 
     - name: Crear documento raíz
       file:
@@ -30,26 +33,36 @@
         mode: '0755'
 
     - name: Copiar página HTML de prueba
-      template:
+      ansible.builtin.template:
         src: "files/index.html.j2"
         dest: "/var/www/{{ http_host }}/index.html"
+        owner: www-data
+        group: www-data
+        mode: '0644'
 
     - name: Configurar anfitrión virtual en Apache2
-      template:
+      ansible.builtin.template:
         src: "files/apache.conf.j2"
         dest: "/etc/apache2/sites-available/{{ http_conf }}"
+        owner: www-data
+        group: www-data
+        mode: '0644'
 
     - name: Habilitar nuevo sitio web
-      shell: /usr/sbin/a2ensite {{ http_conf }}
+      ansible.builtin.command:
+        cmd: "/usr/sbin/a2ensite {{ http_conf }}"
+        creates: "/etc/apache2/sites-enabled/{{ http_conf }}"
       notify: Recargar Apache2
 
     - name: Deshabilitar sitio web por defecto de Apache2
-      shell: /usr/sbin/a2dissite 000-default.conf
+      ansible.builtin.command:
+        cmd: /usr/sbin/a2dissite 000-default.conf
+        removes: /etc/apache2/sites-enabled/000-default.conf
       when: disable_default
       notify: Recargar Apache2
 
     - name: Instalación de cortafuegos UFW
-      apt: name=ufw update_cache=yes state=latest
+      apt: name=ufw update_cache=yes state=present
 
     - name: "Cortafuegos UFW: Permitir HTTP en el número de puerto {{ http_port }}"
       ufw:
