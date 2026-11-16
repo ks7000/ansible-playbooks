@@ -16,7 +16,7 @@ env:
 jobs:
   lint-and-syntax:
     name: Verificación de sintaxis de código con Ansible-Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Copia de este repositorio a ser comprobado
         uses: actions/checkout@v4
