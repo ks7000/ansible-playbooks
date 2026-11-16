@@ -1,6 +1,6 @@
 # Apache en Ubuntu 26.04
 
-Este libreto instalará el servidor web Apache 2 en un equipo con Ubuntu 26.04, tal y como se explica en la guía [Instalando y configurando Ansible en Ubuntu 26.04] (https://www.ks7000.net.ve/2026/11/13/instalando-y-configurando-ansible-en-ubuntu-26-04/). Se creará un host virtual utilizando las opciones especificadas en el archivo de variables `vars/default.yml`.
+Este libreto instalará el servidor web Apache 2 en un equipo con Ubuntu 26.04, tal y como se explica en la guía [Instalando y configurando Ansible en Ubuntu 26.04](https://www.ks7000.net.ve/2026/11/13/instalando-y-configurando-ansible-en-ubuntu-26-04/). Se creará un host virtual utilizando las opciones especificadas en el archivo de variables `vars/default.yml`.
 
 ## Configuración
 
@@ -17,8 +17,10 @@ Pasos rápidos:
 ### 1. Obtener el libreto
 
 ```shell
-git clone https://github.com/ks7000/ansible-playbooks.git
+cd 
+[ -d "ansible-playbooks" ] || git clone https://github.com/ks7000/ansible-playbooks.git
 cd ansible-playbooks/apache_ubuntu2604
+git pull
 ```
 
 ### 2. Personalizar opciones

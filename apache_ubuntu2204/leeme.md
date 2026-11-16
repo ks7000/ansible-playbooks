@@ -17,8 +17,10 @@ Pasos rápidos:
 ### 1. Obtener el libreto
 
 ```shell
-git clone https://github.com/ks7000/ansible-playbooks.git
-cd ansible-playbooks/apache_ubuntu2204
+cd 
+[ -d "ansible-playbooks" ] || git clone https://github.com/ks7000/ansible-playbooks.git
+cd ansible-playbooks/apache_ubuntu2604
+git pull
 ```
 
 ### 2. Personalizar opciones

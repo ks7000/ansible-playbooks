@@ -1,6 +1,6 @@
-##################################################
-# DO Community Playbooks: Apache on Ubuntu 18.04
-##################################################
+############################################################
+# Comunidad DO / Comunidad KS7000: Apache2 en Ubuntu 24.04 #
+############################################################
 ---
 - hosts: all
   become: true
@@ -8,6 +8,13 @@
     - vars/default.yml
 
   tasks:
+    - name: Verificar si es Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_facts["distribution"] == "Ubuntu"
+          - ansible_facts["distribution_version"] == "24.04"
+        fail_msg: "Este libreto está diseñado solamente para Ubuntu 24.04 ."
+
     - name: Prerrequisitos de instalación
       apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
       loop: [ 'aptitude' ]
