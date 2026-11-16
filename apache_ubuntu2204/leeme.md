@@ -38,7 +38,7 @@ disable_default: true
 ```
 
 ```shell
-sudo echo "192.168.9.202 servidor_202.ks7000.net.ve" >> /etc/hosts
+echo "192.168.9.202 servidor_202.ks7000.net.ve" | sudo tee -a /etc/hosts
 
 mkdir \
 -p ~/proyecto-ansible-ubuntu/inventories\
@@ -53,11 +53,18 @@ Colocar la contraseña y guardar fichero. Aplicar derecho de lectura solamente a
 ```shell
 chmod 600 \
 ~/proyecto-ansible-ubuntu/inventories\
-/servidores_ubuntu/host_vars/servidor_207/eleva.txt
+/servidores_ubuntu/host_vars/servidor_202/eleva.txt
 ```
 
 ### 3. Ejecutar el libreto
 
 ```command
-ansible-playbook -l servidor_202 -i ~/ansible-playbooks/hosts.ini -u $(whoami))$ playbook.yml
+ansible-playbook -l servidor_202 -i ~/ansible-playbooks/hosts.ini -u $(whoami) playbook.yml
+```
+### 4. Verificar la página HTML
+
+Ejecutar el navegador web preferido e introducir en la barra de direcciones:
+
+```
+http://servidor_202.ks7000.net.ve/
 ```
