@@ -41,6 +41,9 @@
       when: disable_default
       notify: Recargar Apache2
 
+    - name: Instalación de cortafuegos UFW
+      apt: name=ufw update_cache=yes state=latest
+
     - name: "Cortafuegos UFW: Permitir HTTP en el número de puerto {{ http_port }}"
       ufw:
         rule: allow
