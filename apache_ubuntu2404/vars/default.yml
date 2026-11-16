@@ -1,0 +1,6 @@
+---
+app_user: "jimmy"
+http_host: "servidor_204"
+http_conf: "servidor_204.conf"
+http_port: "80"
+disable_default: true
