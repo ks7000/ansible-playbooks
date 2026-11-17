@@ -25,20 +25,16 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - name: Paso 01 - Copia de este repositorio a ser comprobado
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Paso 02 - Establece Python 3.11 como herramienta predeterminada
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.11'
 
-      - name: Paso 03.0 - Instala Ansible y Ansible-Lint
+      - name: Paso 03 - Instala Ansible y Ansible-Lint
         run: |
           pip install ansible ansible-lint
-
-      - name: Paso 03.1 - Instalar colecciones de Ansible
-        run: |
-          ansible-galaxy collection install community.mysql
 
       - name: Paso 04.1 - Verificación de sintaxis de libreto de apache_ubuntu2204
         run: |
