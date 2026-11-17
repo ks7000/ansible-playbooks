@@ -4,10 +4,14 @@ on:
   push:
     paths:
       - 'apache_ubuntu2204/**'
+      - 'apache_ubuntu2404/**'
+      - 'apache_ubuntu2604/**'
       - '.github/workflows/playbook.yml'
   pull_request:
     paths:
       - 'apache_ubuntu2204/**'
+      - 'apache_ubuntu2404/**'
+      - 'apache_ubuntu2604/**'
       - '.github/workflows/playbook.yml'
 
 env:
@@ -16,7 +20,7 @@ env:
 jobs:
   lint-and-syntax:
     name: Verificación de sintaxis de código con Ansible-Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Copia de este repositorio a ser comprobado
         uses: actions/checkout@v4
@@ -30,11 +34,33 @@ jobs:
         run: |
           pip install ansible ansible-lint
 
-      - name: Ejecuta Ansible-Lint
+      - name: Ejecuta Ansible-Lint en apache_ubuntu2204
         run: |
           ansible-lint apache_ubuntu2204/
 
-      - name: Verificación de sintaxis de libreto
+      - name: Verificación de sintaxis de libreto de apache_ubuntu2204
+        run: |
+          for playbook in */playbook.yml; do
+            echo "Verificando sintaxis de $playbook..."
+            ansible-playbook --syntax-check "$playbook"
+          done
+
+      - name: Ejecuta Ansible-Lint en apache_ubuntu2404
+        run: |
+          ansible-lint apache_ubuntu2404/
+
+      - name: Verificación de sintaxis de libreto de apache_ubuntu2404
+        run: |
+          for playbook in */playbook.yml; do
+            echo "Verificando sintaxis de $playbook..."
+            ansible-playbook --syntax-check "$playbook"
+          done
+
+      - name: Ejecuta Ansible-Lint en apache_ubuntu2604
+        run: |
+          ansible-lint apache_ubuntu2604/
+
+      - name: Verificación de sintaxis de libreto de apache_ubuntu2604
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
