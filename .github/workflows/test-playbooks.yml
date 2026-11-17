@@ -32,9 +32,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Paso 03 - Instala Ansible y Ansible-Lint
+      - name: Paso 03.0 - Instala Ansible y Ansible-Lint
         run: |
           pip install ansible ansible-lint
+
+      - name: Paso 03.1 - Instalar colecciones de Ansible
+        run: |
+          ansible-galaxy collection install community.mysql
 
       - name: Paso 04.1 - Verificación de sintaxis de libreto de apache_ubuntu2204
         run: |
@@ -50,7 +54,7 @@ jobs:
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
-            ansible-playbook --syntax-check "$playbook"
+            ansible-playbook -i localhost --syntax-check "$playbook"
           done
       - name: Paso 05.2 - Ejecuta Ansible-Lint en apache_ubuntu2404
         run: |
@@ -60,7 +64,7 @@ jobs:
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
-            ansible-playbook --syntax-check "$playbook"
+            ansible-playbook -i localhost --syntax-check "$playbook"
           done
       - name: Paso 06.2 - Ejecuta Ansible-Lint en apache_ubuntu2604
         run: |
@@ -70,7 +74,7 @@ jobs:
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
-            ansible-playbook --syntax-check "$playbook"
+            ansible-playbook -i localhost --syntax-check "$playbook"
           done
       - name: Paso 07.2 - Ejecuta Ansible-Lint en lamp_ubuntu2204
         run: |
