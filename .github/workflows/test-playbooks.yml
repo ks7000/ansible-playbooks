@@ -24,54 +24,54 @@ jobs:
     name: Verificación de sintaxis de código con Ansible-Lint
     runs-on: ubuntu-26.04
     steps:
-      - name: Copia de este repositorio a ser comprobado
+      - name: Paso 01 - Copia de este repositorio a ser comprobado
         uses: actions/checkout@v4
 
-      - name: Establece Python 3.11 como herramienta predeterminada
+      - name: Paso 02 - Establece Python 3.11 como herramienta predeterminada
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Instala Ansible y Ansible-Lint
+      - name: Paso 03 - Instala Ansible y Ansible-Lint
         run: |
           pip install ansible ansible-lint
 
-      - name: Verificación de sintaxis de libreto de apache_ubuntu2204
+      - name: Paso 04.1 - Verificación de sintaxis de libreto de apache_ubuntu2204
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
             ansible-playbook --syntax-check "$playbook"
           done
-      - name: Ejecuta Ansible-Lint en apache_ubuntu2204
+      - name: Paso 04.2 - Ejecuta Ansible-Lint en apache_ubuntu2204
         run: |
           ansible-lint apache_ubuntu2204/
 
-      - name: Verificación de sintaxis de libreto de apache_ubuntu2404
+      - name: Paso 05.1 - Verificación de sintaxis de libreto de apache_ubuntu2404
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
             ansible-playbook --syntax-check "$playbook"
           done
-      - name: Ejecuta Ansible-Lint en apache_ubuntu2404
+      - name: Paso 05.2 - Ejecuta Ansible-Lint en apache_ubuntu2404
         run: |
           ansible-lint apache_ubuntu2404/
 
-      - name: Verificación de sintaxis de libreto de apache_ubuntu2604
+      - name: Paso 06.1 - Verificación de sintaxis de libreto de apache_ubuntu2604
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
             ansible-playbook --syntax-check "$playbook"
           done
-      - name: Ejecuta Ansible-Lint en apache_ubuntu2604
+      - name: Paso 06.2 - Ejecuta Ansible-Lint en apache_ubuntu2604
         run: |
           ansible-lint apache_ubuntu2604/
 
-      - name: Verificación de sintaxis de libreto de lamp_ubuntu2204
+      - name: Paso 07.1 - Verificación de sintaxis de libreto de lamp_ubuntu2204
         run: |
           for playbook in */playbook.yml; do
             echo "Verificando sintaxis de $playbook..."
             ansible-playbook --syntax-check "$playbook"
           done
-      - name: Ejecuta Ansible-Lint en lamp_ubuntu2204
+      - name: Paso 07.2 - Ejecuta Ansible-Lint en lamp_ubuntu2204
         run: |
           ansible-lint lamp_ubuntu2204/

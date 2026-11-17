@@ -2,85 +2,105 @@
 # Comunidad DO / Comunidad KS7000: LAMP en Ubuntu 22.04 #
 #########################################################
 ---
-- hosts: servidor_202
+- name: Configurar LAMP en Ubuntu 22.04
+  hosts: servidor_202
   become: true
   vars_files:
     - vars/default.yml
 
   tasks:
-    - name: Install prerequisites
-      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
-      loop: [ 'aptitude' ]
+    - name: Paso 01 - Instalar prerrequisitos
+      ansible.builtin.apt:
+        name: {{ item }}
+        update_cache: true
+        state: present
+        force_apt_get: true
+      loop: ['aptitude']
 
-  #Apache Configuration
-    - name: Install LAMP Packages
-      apt: name={{ item }} update_cache=yes state=latest
-      loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php' ]
+    - name: Paso 02 - Instalar paquetes LAMP
+      ansible.builtin.apt:
+        name: {{ item }}
+        update_cache: true
+        state: present
+      loop: ['apache2','mysql-server','python3-pymysql','php','php-mysql','libapache2-mod-php','nano']
 
-    - name: Create document root
-      file:
+    - name: Paso 03.1 - Crea directorio raíz de anfitrión (Apache2)
+      ansible.builtin.file:
         path: "/var/www/{{ http_host }}"
         state: directory
         owner: "{{ app_user }}"
         mode: '0755'
 
-    - name: Set up Apache virtualhost
-      template:
+    - name: Paso 03.2 - Configurar anfitrión virtual (Apache2)
+      ansible.builtin.template:
         src: "files/apache.conf.j2"
         dest: "/etc/apache2/sites-available/{{ http_conf }}"
-      notify: Reload Apache
+        owner: www-data
+        group: www-data
+        mode: '0644'
+      notify: Recargar Apache2
 
-    - name: Enable new site
-      shell: /usr/sbin/a2ensite {{ http_conf }}
-      notify: Reload Apache
+    - name: Paso 03.3 - Habilitar nuevo sitio web (Apache2)
+      ansible.builtin.command:
+        cmd: "/usr/sbin/a2ensite {{ http_conf }}"
+        creates: "/etc/apache2/sites-enabled/{{ http_conf }}"
+      notify: Recargar Apache2
 
-    - name: Disable default Apache site
-      shell: /usr/sbin/a2dissite 000-default.conf
+    - name: Paso 03.4 - Deshabilitar sitio web por defecto de Apache2
+      ansible.builtin.command:
+        cmd: /usr/sbin/a2dissite 000-default.conf
+        removes: /etc/apache2/sites-enabled/000-default.conf
       when: disable_default
-      notify: Reload Apache
+      notify: Recargar Apache2
 
-  # MySQL Configuration
-    - name: Sets the root password
-      mysql_user:
+    - name: Paso 04.1 - Configurar contraseña de usuario root (MySQL)
+      community.mysql.mysql_user:
         name: root
         password: "{{ mysql_root_password }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
 
-    - name: Removes all anonymous user accounts
-      mysql_user:
+    - name: Paso 04.2 - Retirar todas las cuentas de usuario anónimas (MySQL)
+      community.mysql.mysql_user:
         name: ''
-        host_all: yes
+        host_all: true
         state: absent
         login_user: root
         login_password: "{{ mysql_root_password }}"
 
-    - name: Removes the MySQL test database
-      mysql_db:
+    - name: Paso 04.3 - Retirar la base de datos de prueba (MySQL)
+      community.mysql.mysql_db:
         name: test
         state: absent
         login_user: root
         login_password: "{{ mysql_root_password }}"
 
-  # UFW Configuration
-    - name: "UFW - Allow HTTP on port {{ http_port }}"
-      ufw:
+    - name: Paso 05.1 - Instalación de cortafuegos UFW
+      ansible.builtin.apt:
+        name: ufw
+        update_cache: true
+        state: present
+
+    - name: "Paso 05.2 - Permitir HTTP en UFW para el número de puerto {{ http_port }}"
+      community.general.ufw:
         rule: allow
         port: "{{ http_port }}"
         proto: tcp
 
-  # PHP Info Page
-    - name: Sets Up PHP Info Page
-      template:
+    - name: Paso 06 - Copiar página de información PHP
+      ansible.builtin.template:
         src: "files/info.php.j2"
         dest: "/var/www/{{ http_host }}/info.php"
+        owner: www-data
+        group: www-data
+        mode: '0644'
 
   handlers:
-    - name: Reload Apache
-      service:
+    - name: Recargar Apache2
+      ansible.builtin.service:
         name: apache2
         state: reloaded
 
-    - name: Restart Apache
-      service:
+    - name: Reiniciar Apache2
+      ansible.builtin.service:
         name: apache2
         state: restarted
