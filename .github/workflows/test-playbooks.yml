@@ -36,9 +36,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Paso 03 - Instala Ansible y Ansible-Lint
+      - name: Paso 03.0 - Instalar Ansible y Ansible-Lint
         run: |
           pipx install ansible ansible-lint
+
+      - name: Paso 03.1 - Instalar community.general collection
+        run: ansible-galaxy collection install community.general
 
       - name: Paso 04.1 - Verificación de sintaxis de libreto de apache_ubuntu2204
         run: |
