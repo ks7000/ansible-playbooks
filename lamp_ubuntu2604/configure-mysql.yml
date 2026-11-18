@@ -36,7 +36,7 @@
         - "::1"
 
     - name: Drop root client credentials configuration file (~/.my.cnf)
-      community.builtin.template:
+      ansible.builtin.template:
         src: root-my.cnf.j2
         dest: /root/.my.cnf
         owner: root
