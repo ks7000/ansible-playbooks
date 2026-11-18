@@ -54,10 +54,36 @@
       notify: Recargar Apache2
 
     - name: Paso 04.1 - Configurar contraseña de usuario root (MySQL)
+      ansible.builtin.systemd:
+        name: mysql
+        state: started
+        enabled: true
+
+    - name: Set MySQL root password idempotently (Initial bootstrap via socket)
       community.mysql.mysql_user:
         name: root
+        host: "{{ item }}"
         password: "{{ mysql_root_password }}"
-        login_unix_socket: /var/run/mysqld/mysqld.sock
+        login_unix_socket: "{{ mysql_socket }}"
+        state: present
+      loop:
+        - "localhost"
+        - "127.0.0.1"
+        - "::1"
+
+    - name: Drop root client credentials configuration file (~/.my.cnf)
+      ansible.builtin.template:
+        src: root-my.cnf.j2
+        dest: /root/.my.cnf
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Verify MySQL connection using the new password credentials
+      community.mysql.mysql_info:
+        login_unix_socket: "{{ mysql_socket }}"
+      register: mysql_verification
+      changed_when: false
 
     - name: Paso 04.2 - Retirar todas las cuentas de usuario anónimas (MySQL)
       community.mysql.mysql_user:
