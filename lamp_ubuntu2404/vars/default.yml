@@ -1,0 +1,7 @@
+---
+mysql_root_password: "mysql_root_password"
+app_user: "jimmy"
+http_host: "servidor_207"
+http_conf: "servidor_207.conf"
+http_port: "80"
+disable_default: true

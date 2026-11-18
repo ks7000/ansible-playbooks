@@ -1,0 +1,106 @@
+#########################################################
+# Comunidad DO / Comunidad KS7000: LAMP en Ubuntu 24.04 #
+#########################################################
+---
+- name: Configurar LAMP en Ubuntu 24.04
+  hosts: servidor_207
+  become: true
+  vars_files:
+    - vars/default.yml
+
+  tasks:
+    - name: Paso 01 - Instalar prerrequisitos
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: present
+        force_apt_get: true
+      loop: ["aptitude"]
+
+    - name: Paso 02 - Instalar paquetes LAMP
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: present
+      loop: ["apache2", "mysql-server", "python3-pymysql", "php", "php-mysql", "libapache2-mod-php", "nano"]
+
+    - name: Paso 03.1 - Crea directorio raíz de anfitrión (Apache2)
+      ansible.builtin.file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        owner: "{{ app_user }}"
+        mode: "0755"
+
+    - name: Paso 03.2 - Configurar anfitrión virtual (Apache2)
+      ansible.builtin.template:
+        src: "files/apache.conf.j2"
+        dest: "/etc/apache2/sites-available/{{ http_conf }}"
+        owner: www-data
+        group: www-data
+        mode: "0644"
+      notify: Recargar Apache2
+
+    - name: Paso 03.3 - Habilitar nuevo sitio web (Apache2)
+      ansible.builtin.command:
+        cmd: "/usr/sbin/a2ensite {{ http_conf }}"
+        creates: "/etc/apache2/sites-enabled/{{ http_conf }}"
+      notify: Recargar Apache2
+
+    - name: Paso 03.4 - Deshabilitar sitio web por defecto de Apache2
+      ansible.builtin.command:
+        cmd: /usr/sbin/a2dissite 000-default.conf
+        removes: /etc/apache2/sites-enabled/000-default.conf
+      when: disable_default
+      notify: Recargar Apache2
+
+    - name: Paso 04.1 - Configurar contraseña de usuario root (MySQL)
+      community.mysql.mysql_user:
+        name: root
+        password: "{{ mysql_root_password }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+
+    - name: Paso 04.2 - Retirar todas las cuentas de usuario anónimas (MySQL)
+      community.mysql.mysql_user:
+        name: ""
+        host_all: true
+        state: absent
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+
+    - name: Paso 04.3 - Retirar la base de datos de prueba (MySQL)
+      community.mysql.mysql_db:
+        name: test
+        state: absent
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+
+    - name: Paso 05.1 - Instalación de cortafuegos UFW
+      ansible.builtin.apt:
+        name: ufw
+        update_cache: true
+        state: present
+
+    - name: "Paso 05.2 - Permitir HTTP en UFW para el número de puerto {{ http_port }}"
+      community.general.ufw:
+        rule: allow
+        port: "{{ http_port }}"
+        proto: tcp
+
+    - name: Paso 06 - Copiar página de información PHP
+      ansible.builtin.template:
+        src: "files/info.php.j2"
+        dest: "/var/www/{{ http_host }}/info.php"
+        owner: www-data
+        group: www-data
+        mode: "0644"
+
+  handlers:
+    - name: Recargar Apache2
+      ansible.builtin.service:
+        name: apache2
+        state: reloaded
+
+    - name: Reiniciar Apache2
+      ansible.builtin.service:
+        name: apache2
+        state: restarted

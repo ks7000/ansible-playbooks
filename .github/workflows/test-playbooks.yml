@@ -7,6 +7,7 @@ on:
       - 'apache_ubuntu2404/**'
       - 'apache_ubuntu2604/**'
       - 'lamp_ubuntu2204/**'
+      - 'lamp_ubuntu2404/**'
       - '.github/workflows/test-playbooks.yml'
   pull_request:
     paths:
@@ -14,6 +15,7 @@ on:
       - 'apache_ubuntu2404/**'
       - 'apache_ubuntu2604/**'
       - 'lamp_ubuntu2204/**'
+      - 'lamp_ubuntu2404/**'
       - '.github/workflows/test-playbooks.yml'
   workflow_dispatch:
 env:
@@ -75,3 +77,13 @@ jobs:
       - name: Paso 07.2 - Ejecuta Ansible-Lint en lamp_ubuntu2204
         run: |
           ansible-lint lamp_ubuntu2204/
+
+      - name: Paso 08.1 - Verificación de sintaxis de libreto de lamp_ubuntu2404
+        run: |
+          for playbook in */playbook.yml; do
+            echo "Verificando sintaxis de $playbook..."
+            ansible-playbook -i localhost --syntax-check "$playbook"
+          done
+      - name: Paso 07.2 - Ejecuta Ansible-Lint en lamp_ubuntu2404
+        run: |
+          ansible-lint lamp_ubuntu2404/

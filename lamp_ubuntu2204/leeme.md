@@ -1,6 +1,10 @@
 # LAMP en Ubuntu 22.04
 
-Esta guía instalará un entorno LAMP (**L**inux, **A**pache, **M**ySQL y **P**HP) en una máquina con Ubuntu 22.04 . Se creará un anfitrión virtual con las opciones especificadas en el archivo de variables `vars/default.yml`
+Esta guía instalará un entorno LAMP (**L**inux, **A**pache, **M**ySQL y **P**HP) en una máquina con Ubuntu 22.04 .
+
+La configuración de inicio del servidor está explicado en el artículo [Instalando y configurando Ansible en Ubuntu 26.04](https://www.ks7000.net.ve/2026/11/13/instalando-y-configurando-ansible-en-ubuntu-26-04/) (también es es válido para 24.04 y 22.04).
+
+Se creará un anfitrión virtual con las opciones especificadas en el archivo de variables `vars/default.yml`
 
 ## Configuración
 
@@ -11,7 +15,6 @@ Esta guía instalará un entorno LAMP (**L**inux, **A**pache, **M**ySQL y **P**H
 - `http_port`: Número de puerto para HTTP, el valor por defecto es 80.
 - `disable_default`: Si se desea desactivar o no el sitio web predeterminado de Apache. Si se establece en `true` (verdadero), su nuevo anfitrión virtual se utilizará como sitio web predeterminado. El valor por defecto es `true`.
 
-
 ## Ejecución del libreto
 
 Guía de inicio rápido para quienes ya están familiarizados con Ansible:
@@ -19,8 +22,8 @@ Guía de inicio rápido para quienes ya están familiarizados con Ansible:
 ### 1. Descargar el libreto
 
 ```shell
-git clone https://github.com/do-community/ansible-playbooks.git
-cd ansible-playbooks/lamp_ubuntu1804
+git clone https://github.com/ks7000/ansible-playbooks.git
+cd ansible-playbooks/lamp_ubuntu2204
 ```
 
 ### 2. Configurar preferencias
@@ -32,17 +35,40 @@ nano vars/default.yml
 ```yml
 ---
 mysql_root_password: "mysql_root_password"
-app_user: "sammy"
-http_host: "your_domain"
-http_conf: "your_domain.conf"
+app_user: "jimmy"
+http_host: "servidor_202.ks7000.net.ve"
+http_conf: "servidor_202.conf"
 http_port: "80"
 disable_default: true
 ```
 
+```shell
+echo "192.168.9.202 servidor_202.ks7000.net.ve" | sudo tee -a /etc/hosts
+
+mkdir \
+-p ~/proyecto-ansible-ubuntu/inventories\
+/servidores_ubuntu/host_vars/servidor_202
+
+nano ~/proyecto-ansible-ubuntu/inventories\
+/servidores_ubuntu/host_vars/servidor_202/eleva.txt
+```
+
+Colocar la contraseña y guardar fichero. Aplicar derecho de lectura solamente al usuario propietario:
+
+```shell
+chmod 600 \
+~/proyecto-ansible-ubuntu/inventories\
+/servidores_ubuntu/host_vars/servidor_202/eleva.txt
+
 ### 3. Ejecutar el libreto
 
 ```command
-ansible-playbook -l [target] -u [remote user] playbook.yml
+ansible-playbook -l servidor_202 -i ~/ansible-playbooks/hosts.ini -u $(whoami) playbook.yml
 ```
+### 4. Verificar la página HTML
 
-Para obtener más información sobre cómo ejecutar esta configuración de Ansible, consultar esta guía: [(en construcción)]().
+Ejecutar el navegador web preferido e introducir en la barra de direcciones:
+
+```
+http://servidor_202.ks7000.net.ve/info.php
+```
