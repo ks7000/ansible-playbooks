@@ -23,7 +23,7 @@
         enabled: true
 
     - name: Set MySQL root password idempotently using caching_sha2_password
-      ansible.mysql.mysql_user:
+      community.mysql.mysql_user:
         name: root
         host: "{{ item }}"
         password: "{{ mysql_root_password }}"
@@ -36,7 +36,7 @@
         - "::1"
 
     - name: Drop root client credentials configuration file (~/.my.cnf)
-      ansible.builtin.template:
+      community.builtin.template:
         src: root-my.cnf.j2
         dest: /root/.my.cnf
         owner: root
@@ -44,7 +44,7 @@
         mode: '0600'
 
     - name: Verify MySQL connection using the new password credentials
-      ansible.mysql.mysql_info:
+      community.mysql.mysql_info:
         login_unix_socket: "{{ mysql_socket }}"
       register: mysql_verification
       changed_when: false
