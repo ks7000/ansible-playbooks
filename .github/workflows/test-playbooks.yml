@@ -8,6 +8,7 @@ on:
       - 'apache_ubuntu2604/**'
       - 'lamp_ubuntu2204/**'
       - 'lamp_ubuntu2404/**'
+      - 'lamp_ubuntu2604/**'
       - '.github/workflows/test-playbooks.yml'
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - 'apache_ubuntu2604/**'
       - 'lamp_ubuntu2204/**'
       - 'lamp_ubuntu2404/**'
+      - 'lamp_ubuntu2604/**'
       - '.github/workflows/test-playbooks.yml'
   workflow_dispatch:
 env:
@@ -26,10 +28,10 @@ jobs:
     name: Verificación de sintaxis de código con Ansible-Lint
     runs-on: ubuntu-26.04
     steps:
-      - name: Paso 01 - Copia de este repositorio a ser comprobado
+      - name: Paso 01 - Copia (o retira) de este repositorio a ser comprobado
         uses: actions/checkout@v7
 
-      - name: Paso 02 - Establece Python 3.11 como herramienta predeterminada
+      - name: Paso 02 - Establece (o remueve) Python 3.11 como herramienta predeterminada
         uses: actions/setup-python@v7
         with:
           python-version: '3.11'
@@ -84,6 +86,16 @@ jobs:
             echo "Verificando sintaxis de $playbook..."
             ansible-playbook -i localhost --syntax-check "$playbook"
           done
-      - name: Paso 07.2 - Ejecuta Ansible-Lint en lamp_ubuntu2404
+      - name: Paso 08.2 - Ejecuta Ansible-Lint en lamp_ubuntu2404
         run: |
           ansible-lint lamp_ubuntu2404/
+
+      - name: Paso 09.1 - Verificación de sintaxis de libreto de lamp_ubuntu2604
+        run: |
+          for playbook in */playbook.yml; do
+            echo "Verificando sintaxis de $playbook..."
+            ansible-playbook -i localhost --syntax-check "$playbook"
+          done
+      - name: Paso 09.2 - Ejecuta Ansible-Lint en lamp_ubuntu2604
+        run: |
+          ansible-lint lamp_ubuntu2604/
