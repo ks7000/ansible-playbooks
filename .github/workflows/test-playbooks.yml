@@ -38,7 +38,7 @@ jobs:
 
       - name: Paso 03 - Instala Ansible y Ansible-Lint
         run: |
-          pip install ansible ansible-lint
+          pipx install ansible ansible-lint
 
       - name: Paso 04.1 - Verificación de sintaxis de libreto de apache_ubuntu2204
         run: |

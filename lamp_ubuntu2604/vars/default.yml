@@ -1,5 +1,5 @@
 ---
-mysql_root_password: "YourSuperSecureRootPassword123!"
+mysql_root_password: "SuSuperContrasenaSecreta211!"
 mysql_socket: "/var/run/mysqld/mysqld.sock"
 app_user: "jimmy"
 http_host: "servidor_211"

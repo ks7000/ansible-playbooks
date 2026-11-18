@@ -53,53 +53,62 @@
       when: disable_default
       notify: Recargar Apache2
 
-    - name: Paso 04.1 - Configurar contraseña de usuario root (MySQL)
-      ansible.builtin.systemd:
+    - name: Paso 04.1 - Verificar que (MySQL 8.4 / 9) está en ejecución y habilitado
+      ansible.builtin.service:
         name: mysql
         state: started
         enabled: true
 
-    - name: Set MySQL root password idempotently (Initial bootstrap via socket)
-      community.mysql.mysql_user:
-        name: root
-        host: "{{ item }}"
-        password: "{{ mysql_root_password }}"
-        login_unix_socket: "{{ mysql_socket }}"
-        state: present
-      loop:
-        - "localhost"
-        - "127.0.0.1"
-        - "::1"
+    - name: Paso 04.2 - Configurar contraseña de usuario root (MySQL 8.4 / 9) con ALTER USER via Unix socket
+      ansible.builtin.command:
+        cmd: >
+          mysql --protocol=socket -u root -e
+          "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{{ mysql_root_password }}'; FLUSH PRIVILEGES;"
+      register: mysql_root_set
+      changed_when: mysql_root_set.rc == 0
+      failed_when:
+        - mysql_root_set.rc != 0
+        - "'Acceso denegado' mysql_root_set.rc != 0"
 
-    - name: Drop root client credentials configuration file (~/.my.cnf)
-      ansible.builtin.template:
-        src: root-my.cnf.j2
+    - name: Paso 04.3 - Crear /root/.my.cnf para iniciar sesión root desde credenciales locales
+      ansible.builtin.copy:
         dest: /root/.my.cnf
         owner: root
         group: root
-        mode: '0600'
+        mode: "0600"
+        content: |
+          [client]
+          user=root
+          password={{ mysql_root_password }}
 
-    - name: Verify MySQL connection using the new password credentials
-      community.mysql.mysql_info:
-        login_unix_socket: "{{ mysql_socket }}"
-      register: mysql_verification
-      changed_when: false
+    - name: Paso 04.4 - Retirar la base de datos de prueba (MySQL)
+      become: true
+      ansible.mysql.mysql_db:
+        name: test
+        state: absent
+        login_host: localhost
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
 
-    - name: Paso 04.2 - Retirar todas las cuentas de usuario anónimas (MySQL)
-      community.mysql.mysql_user:
+    - name: Paso 04.5 - Retirar todas las cuentas de usuario anónimas (MySQL)
+      become: true
+      ansible.mysql.mysql_user:
         name: ""
         host_all: true
         state: absent
+        login_host: localhost
         login_user: root
         login_password: "{{ mysql_root_password }}"
 
-    - name: Paso 04.3 - Retirar la base de datos de prueba (MySQL)
-      community.mysql.mysql_db:
-        name: test
-        state: absent
+    - name: Paso 04.6 - Crear una base de datos nueva en MySQL 8.4 / 9
+      ansible.mysql.mysql_db:
+        name: "app_production2"
+        encoding: utf8mb4
+        collation: utf8mb4_unicode_ci
+        state: present
         login_user: root
         login_password: "{{ mysql_root_password }}"
-
+        
     - name: Paso 05.1 - Instalación de cortafuegos UFW
       ansible.builtin.apt:
         name: ufw

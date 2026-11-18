@@ -4,7 +4,9 @@ Esta guía instalará un entorno LAMP (**L**inux, **A**pache, **M**ySQL y **P**H
 
 La configuración de inicio del servidor está explicado en el artículo [Instalando y configurando Ansible en Ubuntu 26.04](https://www.ks7000.net.ve/2026/11/13/instalando-y-configurando-ansible-en-ubuntu-26-04/) (también es es válido para 24.04 y 22.04).
 
-Se creará un anfitrión virtual con las opciones especificadas en el archivo de variables `vars/default.yml`
+Se creará un anfitrión virtual con las opciones especificadas en el archivo de variables `vars/default.yml` .
+
+En la carpeta `../host_vars` se guarda un fichero `servidor_211.yml` con la ruta de la clave SSH.
 
 ## Configuración
 
@@ -34,13 +36,16 @@ nano vars/default.yml
 
 ```yml
 ---
-mysql_root_password: "mysql_root_password"
+mysql_root_password: "SuSuperContrasenaSecreta211!"
 app_user: "jimmy"
 http_host: "servidor_211.ks7000.net.ve"
 http_conf: "servidor_211.conf"
 http_port: "80"
 disable_default: true
 ```
+
+> [!WARNING]
+> Las contraseñas deben ir sin caracteres especiales, tal como la letra eñe (sí, irónico).
 
 ```shell
 echo "192.168.9.211 servidor_211.ks7000.net.ve" | sudo tee -a /etc/hosts
