@@ -41,7 +41,7 @@ jobs:
           pipx install ansible ansible-lint
 
       - name: Paso 03.1 - Instalar community.general collection
-        run: ansible-galaxy collection install community.general
+        run: ansible-galaxy --force collection install community.general
 
       - name: Paso 04.1 - Verificación de sintaxis de libreto de apache_ubuntu2204
         run: |
