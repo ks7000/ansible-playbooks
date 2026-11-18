@@ -1,0 +1,3 @@
+collections:
+  - name: community.mysql
+  # - name: ansible.mysql  # Uncomment if you have a valid Galaxy/Automation Hub source for this
