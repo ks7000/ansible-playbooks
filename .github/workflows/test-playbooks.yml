@@ -1,4 +1,4 @@
-name: Pruebas de libretos Ansible (sintaxis)
+name: Pruebas de libretos Ansible (sintaxis con ansible-lint)
 
 on:
   push:
