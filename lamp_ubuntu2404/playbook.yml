@@ -68,7 +68,7 @@
         login_password: "{{ mysql_root_password }}"
 
     - name: Paso 04.3 - Retirar la base de datos de prueba (MySQL)
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: test
         state: absent
         login_user: root
