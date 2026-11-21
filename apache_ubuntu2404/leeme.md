@@ -38,7 +38,6 @@ http_conf: "servidor_207.conf"
 http_port: "80"
 disable_default: true
 ```
-
 ```shell
 echo "192.168.9.207 servidor_207.ks7000.net.ve" | sudo tee -a /etc/hosts
 
@@ -56,6 +55,15 @@ Colocar la contraseña y guardar fichero. Aplicar derecho de lectura solamente a
 chmod 600 \
 ~/proyecto-ansible-ubuntu/inventories\
 /servidores_ubuntu/host_vars/servidor_207/eleva.txt
+```
+
+```shell
+nano ansible.cfg
+```
+
+```
+become_password_file = ~/proyecto-ansible-ubuntu/inventories/servidores_ubuntu/host_vars/servidor_207/eleva.txt
+inventory = ../hosts.ini
 ```
 
 ### 3. Ejecutar el libreto

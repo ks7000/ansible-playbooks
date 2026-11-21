@@ -58,6 +58,15 @@ chmod 600 \
 /servidores_ubuntu/host_vars/servidor_202/eleva.txt
 ```
 
+```shell
+nano ansible.cfg
+```
+
+```
+become_password_file = ~/proyecto-ansible-ubuntu/inventories/servidores_ubuntu/host_vars/servidor_202/eleva.txt
+inventory = ../hosts.ini
+```
+
 ### 3. Ejecutar el libreto
 
 ```command

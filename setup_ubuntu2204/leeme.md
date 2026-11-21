@@ -43,10 +43,34 @@ copy_local_key: "{{ lookup('file', lookup('env','HOME') + '~/.ssh/ansible-nodo-c
 sys_packages: [ 'curl', 'vim', 'git', 'ufw']
 ```
 
+```shell
+mkdir \
+-p ~/proyecto-ansible-ubuntu/inventories\
+/servidores_ubuntu/host_vars/servidor_202
+
+nano ~/proyecto-ansible-ubuntu/inventories\
+/servidores_ubuntu/host_vars/servidor_202/eleva.txt
+```
+
+Colocar la contraseña y guardar fichero. Aplicar derecho de lectura solamente al usuario propietario:
+
+```shell
+chmod 600 \
+~/proyecto-ansible-ubuntu/inventories\
+/servidores_ubuntu/host_vars/servidor_202/eleva.txt
+```
+
+```shell
+nano ansible.cfg
+```
+
+```
+become_password_file = ~/proyecto-ansible-ubuntu/inventories/servidores_ubuntu/host_vars/servidor_202/eleva.txt
+inventory = ../hosts.ini
+```
+
 ### 3. Ejecutar libreto
 
 ```command
 ansible-playbook -l [target] -i [inventory file] -u [remote user] playbook.yml
 ```
-
-Para obtener más información sobre cómo ejecutar esta configuración de Ansible, consulta esta guía en inglés: [Initial Server Setup Guide for Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-automate-initial-server-setup-on-ubuntu-18-04).
