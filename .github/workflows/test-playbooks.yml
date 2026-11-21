@@ -3,22 +3,16 @@ name: Pruebas de libretos Ansible (sintaxis con ansible-lint)
 on:
   push:
     paths:
-#      - 'apache_ubuntu2204/**'
-#      - 'apache_ubuntu2404/**'
-#      - 'apache_ubuntu2604/**'
-#      - 'lamp_ubuntu2204/**'
-#      - 'lamp_ubuntu2404/**'
-#      - 'lamp_ubuntu2604/**'
-#      - '.github/workflows/test-playbooks.yml'
-  pull_request:
-    paths:
-#      - 'apache_ubuntu2204/**'
-#      - 'apache_ubuntu2404/**'
-#      - 'apache_ubuntu2604/**'
-#      - 'lamp_ubuntu2204/**'
-#      - 'lamp_ubuntu2404/**'
-#      - 'lamp_ubuntu2604/**'
-#      - '.github/workflows/test-playbooks.yml'
+      - 'apache_ubuntu2204/**'
+      - 'apache_ubuntu2404/**'
+      - 'apache_ubuntu2604/**'
+      - 'lamp_ubuntu2204/**'
+      - 'lamp_ubuntu2404/**'
+      - 'lamp_ubuntu2604/**'
+      - 'setup_ubuntu2204/**'
+      - 'setup_ubuntu2404/**'
+      - 'setup_ubuntu2604/**'
+      - '.github/workflows/test-playbooks.yml'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
