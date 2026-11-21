@@ -44,7 +44,7 @@ http_port: "80"
 disable_default: true
 ```
 
-> [!WARNING]
+> ⚠️ **Advertencia**
 > Las contraseñas deben ir sin caracteres especiales, tal como la letra eñe (sí, irónico).
 
 ```shell
