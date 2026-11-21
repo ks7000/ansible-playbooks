@@ -1,0 +1,69 @@
+################################################################################
+# Comunidad DO Community / Comunidad ks7000: Configuración inicial de servidor #
+################################################################################
+---
+- name: Configuración inicial básica en Ubuntu 24.04
+  hosts: servidor_207
+  become: true
+  vars_files:
+    - vars/default.yml
+
+  tasks:
+    - name: Paso 01 - Instalar prerrequisitos
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        update_cache: true
+        state: present
+        force_apt_get: true
+      loop: ["aptitude"]
+
+    - name: Paso 02 - Verificar que existe grupo de usuarios llamado `wheel` (herencia de Red Hat)
+      ansible.builtin.group:
+        name: wheel
+        state: present
+
+    - name: Paso 03 - Permitir que el grupo 'wheel' ejecute `sudo` directo y sin barrera alguna
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: Paso 04 - Crear usuario estándar con derechos de administrador (_sudoer_)
+      ansible.builtin.user:
+        name: "{{ create_user }}"
+        state: present
+        groups: wheel
+        append: true
+        create_home: true
+        shell: /bin/bash
+
+    - name: Paso 05 - Copiar clave privada/pública SSH para dicho usuario
+      ansible.posix.authorized_key:
+        user: "{{ create_user }}"
+        state: present
+        key: "{{ copy_local_key }}"
+
+    - name: Paso 05 - Prohibe al usuario `root` conectarse por SSH mediante contraseña
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+
+    - name: Paso 06 - Instalar paquetes de software
+      ansible.builtin.apt:
+        name: "{{ sys_packages }}"
+        state: present
+
+    - name: Paso 07 - Permitir conexiones SSH en UFW
+      community.general.ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: Paso 08 - Denegar todo tráfico con UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming

@@ -1,6 +1,6 @@
 # Configuración inicial del servidor en Ubuntu 22.04
 
-Este guion llevará a cabo una configuración inicial del servidor para sistemas Ubuntu 18.04, tal y como se explica en la guía en inglés: [Instalando y configurando Ansible en Ubuntu 26.04](https://www.ks7000.net.ve/2026/11/13/instalando-y-configurando-ansible-en-ubuntu-26-04/).
+Este guion llevará a cabo una configuración inicial del servidor para sistemas Ubuntu 22.04, tal y como se explica en la guía en inglés: [Instalando y configurando Ansible en Ubuntu 26.04](https://www.ks7000.net.ve/2026/11/13/instalando-y-configurando-ansible-en-ubuntu-26-04/).
 
 > ⚠️ **Advertencia**
 >
@@ -39,7 +39,7 @@ nano vars/default.yml
 #vars/default.yml
 ---
 create_user: sammy
-copy_local_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+copy_local_key: "{{ lookup('file', lookup('env','HOME') + '~/.ssh/ansible-nodo-control.pub') }}"
 sys_packages: [ 'curl', 'vim', 'git', 'ufw']
 ```
 
