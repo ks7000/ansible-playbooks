@@ -1,0 +1,31 @@
+---
+#PHP Settings
+php_modules:
+  [
+    "php-curl",
+    "php-gd",
+    "php-mbstring",
+    "php-xml",
+    "php-xmlrpc",
+    "php-soap",
+    "php-intl",
+    "php-zip",
+  ]
+
+#MySQL Settings
+mysql_db: "wordpress"
+mysql_user: "sammy_user"
+mysql_password: "sammy_password"
+mysql_root_password: "SuSuperContrasenaSecreta211!"
+mysql_socket: "/var/run/mysqld/mysqld.sock"
+
+#HTTP Settings
+http_host: "servidor_202"
+http_conf: "servidor_202.conf"
+http_port: "80"
+apache_service: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+apache_user: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
+apache_group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
+apache_conf_dir: >-
+  {{ '/etc/apache2/sites-available' if ansible_os_family == 'Debian' else '/etc/httpd/conf.d'
+  }}

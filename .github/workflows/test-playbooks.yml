@@ -12,6 +12,9 @@ on:
       - 'setup_ubuntu2204/**'
       - 'setup_ubuntu2404/**'
       - 'setup_ubuntu2604/**'
+      - 'wordpress-lamp_ubuntu2204/**'
+      - 'wordpress-lamp_ubuntu2404/**'
+      - 'wordpress-lamp_ubuntu2604/**'
       - '.github/workflows/test-playbooks.yml'
 
 env:

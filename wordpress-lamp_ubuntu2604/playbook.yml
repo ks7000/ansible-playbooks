@@ -1,0 +1,219 @@
+##############################################################
+# Comunidad DO / Comunidad KS7000: WordPress en Ubuntu 26.04 #
+##############################################################
+---
+- name: WordPress en Ubuntu 26.04
+  hosts: servidor_211
+  become: true
+  vars_files:
+    - vars/default.yml
+
+  tasks:
+    - name: Paso 01.1 - Instalar prerrequisitos
+      ansible.builtin.apt:
+        name:
+          - aptitude
+          - python3-pymysql
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+        lock_timeout: 300
+      tags: [system, aptitude, python]
+
+    - name: Paso 01.2 - Instalar paquetes LAMP
+      ansible.builtin.apt:
+        name: >-
+          {{ ['apache2', 'mysql-server', 'php', 'nano', 'php-mysql', 'libapache2-mod-php']
+          + (php_modules | default([])) }}
+        state: present
+        lock_timeout: 300
+      tags: [system, apache, php, mysql, nano]
+
+    - name: Paso 02.1 - Crea directorio raíz de anfitrión (Apache2)
+      ansible.builtin.file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        mode: '0755'
+      tags: [apache]
+
+    - name: Paso 02.2 - Configurar anfitrión virtual (Apache2)
+      ansible.builtin.template:
+        src: "files/apache.conf.j2"
+        dest: "/etc/apache2/sites-available/{{ http_conf }}"
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        mode: "0644"
+      notify: Recargar Apache2
+      tags: [apache]
+
+    - name: Paso 02.3 - Habilitar "permalinks" para WP (Apache2)
+      ansible.builtin.command:
+        cmd: /usr/sbin/a2enmod rewrite
+      notify: Recargar Apache2
+      changed_when: true
+      tags: [apache]
+
+    - name: Paso 02.4 - Habilitar nuevo sitio web WP (Apache2)
+      ansible.builtin.command:
+        cmd: "/usr/sbin/a2ensite {{ http_conf }}"
+      notify: Recargar Apache2
+      changed_when: true
+      tags: [apache]
+
+    - name: Paso 02.5 - Deshabilitar sitio web por defecto de Apache2
+      ansible.builtin.command:
+        cmd: /usr/sbin/a2dissite 000-default.conf
+        removes: /etc/apache2/sites-enabled/000-default.conf
+      changed_when: true
+      notify: Recargar Apache2
+      tags: [apache]
+
+    - name: Paso 03.1 - Verificar que (MySQL 8.4 / 9) está en ejecución y habilitado
+      ansible.builtin.service:
+        name: mysql
+        state: started
+        enabled: true
+      tags: [mysql]
+
+    - name: Paso 03.2 - Comprobar si /root/.my.cnf ya existe
+      ansible.builtin.stat:
+        path: /root/.my.cnf
+      register: my_cnf_file
+      tags: [mysql]
+
+    - name: Paso 03.3 - Establecer contraseña inicial de root vía Unix Socket (solamente primera vez)
+      ansible.builtin.command:
+        cmd: >
+          mysql --protocol=socket -u root -e
+          "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{{ mysql_root_password }}'; FLUSH PRIVILEGES;"
+      when: not my_cnf_file.stat.exists
+      changed_when: true
+      no_log: false
+      tags: [mysql]
+
+    - name: Paso 03.4 - Crear /root/.my.cnf para iniciar sesión root desde credenciales locales
+      ansible.builtin.copy:
+        dest: /root/.my.cnf
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          [client]
+          user=root
+          password="{{ mysql_root_password }}"
+      when: not my_cnf_file.stat.exists
+      no_log: false
+      tags: [mysql]
+
+#    - name: Asegurar contraseña y plugin de root en MySQL (idempotente)
+#      community.mysql.mysql_query:
+#        query: >
+#          ALTER USER 'root'@'localhost'
+#          IDENTIFIED WITH caching_sha2_password
+#          BY '{{ mysql_root_password }}';
+#        config_file: /root/.my.cnf
+#      changed_when: false
+#      no_log: false
+#      tags: [mysql]
+
+    - name: Paso 03.5 - Retirar la base de datos de prueba (MySQL)
+      become: true
+      community.mysql.mysql_db:
+        name: test
+        state: absent
+        login_host: localhost
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [mysql]
+
+    - name: Paso 04.5 - Retirar todas las cuentas de usuario anónimas (MySQL)
+      become: true
+      community.mysql.mysql_user:
+        name: ""
+        host_all: true
+        state: absent
+        config_file: /root/.my.cnf
+      tags: [mysql]
+
+    - name: Paso 04.6 - Crear una base de datos nueva para WordPress en MySQL 8.4 / 9
+      community.mysql.mysql_db:
+        name: "{{ mysql_db }}"
+        encoding: utf8mb4
+        collation: utf8mb4_unicode_ci
+        state: present
+        config_file: /root/.my.cnf
+      tags: [mysql]
+
+    - name: Paso 04.7 - Crear usuario en MySQL para WordPress y asignar permisos
+      community.mysql.mysql_query:
+        query:
+          - >
+            CREATE USER IF NOT EXISTS '{{ mysql_user }}'@'localhost'
+            IDENTIFIED WITH caching_sha2_password BY '{{ mysql_password }}';
+          - >
+            ALTER USER '{{ mysql_user }}'@'localhost'
+            IDENTIFIED WITH caching_sha2_password BY '{{ mysql_password }}';
+          - "GRANT ALL PRIVILEGES ON `{{ mysql_db }}`.* TO '{{ mysql_user }}'@'localhost';"
+          - "FLUSH PRIVILEGES;"
+        config_file: /root/.my.cnf
+      changed_when: false
+      no_log: false
+      tags: [mysql]
+
+    - name: Paso 05.1 - Instalación de cortafuegos UFW
+      ansible.builtin.apt:
+        name: ufw
+        update_cache: true
+        state: present
+
+    - name: "Paso 05.2 - Permitir HTTP en UFW para el número de puerto {{ http_port }}"
+      community.general.ufw:
+        rule: allow
+        port: "{{ http_port | string }}"
+        proto: tcp
+      tags: [system, firewall, ufw]
+
+    - name: Paso 06.1 - Descargar y descomprimir última versión de WordPress
+      ansible.builtin.unarchive:
+        src: https://wordpress.org/latest.tar.gz
+        dest: "/var/www/{{ http_host }}"
+        remote_src: true
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        creates: "/var/www/{{ http_host }}/wordpress"
+      tags: [wordpress]
+
+    - name: Paso 06.2 - Establecer propiedad y permisos seguros en WordPress
+      ansible.builtin.file:
+        path: "/var/www/{{ http_host }}/wordpress"
+        state: directory
+        recurse: true
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        mode: "u=rwX,g=rX,o="
+      tags: [wordpress]
+
+    - name: Paso 06.3 - Configurar archivo wp-config.php
+      ansible.builtin.template:
+        src: "files/wp-config.php.j2"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        mode: "0640"
+      no_log: false
+      tags: [wordpress]
+
+  handlers:
+    - name: Recargar Apache2
+      ansible.builtin.service:
+        name: "{{ apache_service }}"
+        state: reloaded
+      tags: [apache]
+
+    - name: Reiniciar Apache2
+      ansible.builtin.service:
+        name: "{{ apache_service }}"
+        state: restarted
+      tags: [apache]
